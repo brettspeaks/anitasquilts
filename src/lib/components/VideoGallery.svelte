@@ -140,12 +140,12 @@
 	<div class="mb-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
 		<div>
 			<h2 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-				<span>Concert Feed</span>
-				<span class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-indigo-950 text-indigo-300 border border-indigo-800/60">
+				<span>Video Showcase</span>
+				<span class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-pink-950/60 text-pink-300 border border-pink-800/60">
 					{filteredVideos.length} {filteredVideos.length === 1 ? 'clip' : 'clips'}
 				</span>
 			</h2>
-			<p class="text-xs text-slate-400 mt-0.5">Live recordings with automated AI intelligence</p>
+			<p class="text-xs text-slate-400 mt-0.5">Live recordings with automated AI multimodal tagging</p>
 		</div>
 
 		<!-- Search Bar -->
@@ -154,7 +154,7 @@
 				type="text"
 				bind:value={searchQuery}
 				placeholder="Search artist, venue, tags..."
-				class="w-full pl-9 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+				class="w-full pl-9 pr-4 py-2 bg-slate-900/90 border border-indigo-900/40 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-pink-500 transition-colors shadow-inner"
 			/>
 			<svg
 				class="w-4 h-4 text-slate-500 absolute left-3 top-2.5 pointer-events-none"
@@ -185,9 +185,9 @@
 			<button
 				type="button"
 				onclick={() => onTagSelect(null)}
-				class="shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer {selectedTag === null
-					? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-					: 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'}"
+				class="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer {selectedTag === null
+					? 'bg-gradient-to-r from-pink-600 to-indigo-600 text-white shadow-md shadow-pink-600/30 border border-white/20'
+					: 'bg-slate-900/90 text-slate-300 hover:text-white border border-indigo-900/40 hover:border-pink-500/30'}"
 			>
 				All Clips
 			</button>
@@ -195,9 +195,9 @@
 				<button
 					type="button"
 					onclick={() => onTagSelect(selectedTag === tag ? null : tag)}
-					class="shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer {selectedTag === tag
-						? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-						: 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 hover:border-slate-700'}"
+					class="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer {selectedTag === tag
+						? 'bg-gradient-to-r from-pink-600 to-indigo-600 text-white shadow-md shadow-pink-600/30 border border-white/20'
+						: 'bg-slate-900/90 text-slate-300 hover:text-white border border-indigo-900/40 hover:border-pink-500/40'}"
 				>
 					{tag}
 				</button>

@@ -42,7 +42,7 @@
 </script>
 
 <div
-	class="group relative flex flex-col overflow-hidden rounded-3xl bg-slate-900/80 border border-slate-800/80 hover:border-slate-700/80 transition-all duration-300 shadow-xl hover:shadow-indigo-950/20"
+	class="group relative flex flex-col overflow-hidden rounded-3xl bg-slate-900/90 border border-indigo-950/80 hover:border-pink-500/40 transition-all duration-300 shadow-xl hover:shadow-pink-950/20 backdrop-blur-sm"
 >
 	<!-- Video Player Container -->
 	<div class="relative aspect-video w-full bg-black/90 overflow-hidden flex items-center justify-center">
@@ -67,7 +67,7 @@
 							d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
 						/>
 						<path
-							class="text-indigo-500 transition-all duration-300"
+							class="text-pink-500 transition-all duration-300"
 							stroke-dasharray="{video.uploadProgress || 10}, 100"
 							stroke-width="3.5"
 							stroke-linecap="round"
@@ -95,15 +95,15 @@
 			{/if}
 			<div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center">
 				<div class="relative flex items-center justify-center w-12 h-12 mb-3">
-					<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-40"></span>
-					<div class="relative p-3 rounded-full bg-violet-600 text-white shadow-lg shadow-violet-600/50">
+					<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-40"></span>
+					<div class="relative p-3 rounded-full bg-gradient-to-tr from-pink-600 to-purple-600 text-white shadow-lg shadow-pink-600/50">
 						<svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
 							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 						</svg>
 					</div>
 				</div>
-				<p class="text-sm font-bold text-violet-300">Gemini 1.5 Flash AI</p>
+				<p class="text-sm font-bold text-pink-300">Gemini 1.5 Flash AI</p>
 				<p class="text-xs text-slate-400 mt-0.5">Extracting artist, venue, visual tags & lyrics...</p>
 			</div>
 		{:else if video.status === 'failed'}
@@ -144,9 +144,9 @@
 				<div class="min-w-0">
 					<h3 class="font-bold text-base sm:text-lg text-white truncate flex items-center gap-1.5">
 						{#if video.artist}
-							<span class="text-indigo-400">{video.artist}</span>
+							<span class="text-pink-300">{video.artist}</span>
 						{:else}
-							<span class="text-slate-300">{video.filename}</span>
+							<span class="text-slate-200">{video.filename}</span>
 						{/if}
 					</h3>
 					{#if video.venue}
@@ -190,9 +190,9 @@
 					<button
 						type="button"
 						onclick={() => onTagClick?.(tag)}
-						class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800/90 hover:bg-indigo-950/80 text-indigo-200 hover:text-indigo-100 border border-slate-700/60 hover:border-indigo-500/50 transition-all cursor-pointer active:scale-95"
+						class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800/90 hover:bg-pink-950/60 text-pink-200 hover:text-white border border-indigo-900/50 hover:border-pink-500/40 transition-all cursor-pointer active:scale-95"
 					>
-						<span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+						<span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
 						{tag}
 					</button>
 				{:else}

@@ -53,18 +53,18 @@
 </script>
 
 <svelte:head>
-	<title>ConcertAI • Instant Video Ingest & AI Tagging</title>
+	<title>AnitaDoesQuiltsAI • Instant Quilt Video & AI Tagging</title>
 </svelte:head>
 
 <div class="flex-1 flex flex-col">
 	<!-- Hero Section with Ultra-Clean Master Upload UI -->
 	<section class="relative pt-8 pb-4 px-4 overflow-hidden text-center">
 		<div class="max-w-2xl mx-auto">
-			<h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200 tracking-tight">
-				Drop a Concert Video.
+			<h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-pink-100 to-indigo-200 tracking-tight drop-shadow-sm">
+				Showcase Your Quilt.
 			</h2>
-			<p class="mt-2 text-sm sm:text-base text-slate-400 font-normal max-w-lg mx-auto">
-				Direct S3/R2 presigned streaming. Screen sleep locked. Automated Gemini 1.5 Flash multimodal tagging.
+			<p class="mt-2 text-sm sm:text-base text-slate-300 font-normal max-w-lg mx-auto">
+				Direct S3/R2 streaming. Screen sleep locked. Automated Gemini 1.5 Flash multimodal quilt & pattern tagging.
 			</p>
 		</div>
 

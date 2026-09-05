@@ -208,7 +208,7 @@
 <div
 	class="w-full max-w-xl mx-auto my-6 px-4"
 	role="region"
-	aria-label="Concert video upload area"
+	aria-label="Quilt video upload area"
 >
 	<!-- Hidden File Input for iOS/Android camera roll and file picker -->
 	<input
@@ -224,8 +224,8 @@
 	<!-- Drag and drop zone / Master single button -->
 	<div
 		class="relative overflow-hidden rounded-3xl border-2 transition-all duration-300 shadow-2xl {isDragging
-			? 'border-indigo-500 bg-indigo-950/40 scale-[1.01]'
-			: 'border-slate-800/80 bg-gradient-to-b from-slate-900/90 to-slate-950/90 hover:border-slate-700'}"
+			? 'border-pink-500 bg-pink-950/40 scale-[1.01]'
+			: 'border-indigo-900/60 bg-slate-950/85 backdrop-blur-xl hover:border-pink-500/40 shadow-indigo-950/50'}"
 		ondragover={(e) => {
 			e.preventDefault();
 			isDragging = true;
@@ -244,22 +244,22 @@
 		<!-- Glow Accent Background -->
 		<div
 			class="pointer-events-none absolute -inset-px opacity-30 blur-2xl transition-opacity duration-500 {isUploading
-				? 'bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 opacity-60 animate-pulse'
-				: 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20'}"
+				? 'bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-500 opacity-60 animate-pulse'
+				: 'bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-indigo-500/20'}"
 		></div>
 
 		<div class="relative p-6 sm:p-8 flex flex-col items-center text-center">
-			<!-- Upload Button Master CTA -->
+			<!-- Upload Button Master CTA (High Contrast) -->
 			<button
 				type="button"
 				onclick={handleButtonClick}
 				disabled={isUploading}
-				class="group w-full py-5 px-8 rounded-2xl font-bold text-lg sm:text-xl text-white shadow-xl transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer {isUploading
-					? 'bg-slate-800 text-slate-400 cursor-not-allowed'
-					: 'bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 hover:from-indigo-500 hover:to-violet-500 hover:shadow-indigo-500/25'}"
+				class="group w-full py-5 px-8 rounded-2xl font-black text-lg sm:text-xl text-white shadow-2xl transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 cursor-pointer border border-white/20 {isUploading
+					? 'bg-slate-800 text-slate-400 cursor-not-allowed border-transparent'
+					: 'bg-gradient-to-r from-pink-600 via-rose-500 to-amber-500 hover:from-pink-500 hover:via-rose-400 hover:to-amber-400 hover:shadow-pink-500/35 hover:scale-[1.01] active:scale-[0.98]'}"
 			>
 				{#if isUploading}
-					<svg class="animate-spin h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24">
+					<svg class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 						<path
 							class="opacity-75"
@@ -267,10 +267,10 @@
 							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 						></path>
 					</svg>
-					<span>Uploading ({currentProgress}%)</span>
+					<span class="text-white drop-shadow-sm">Uploading ({currentProgress}%)</span>
 				{:else}
 					<svg
-						class="w-7 h-7 text-indigo-200 group-hover:scale-110 transition-transform"
+						class="w-7 h-7 text-white drop-shadow-sm group-hover:scale-110 transition-transform"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -278,22 +278,22 @@
 						<path
 							stroke-linecap="round"
 							stroke-linejoin="round"
-							stroke-width="2.5"
+							stroke-width="2.6"
 							d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
 						></path>
 					</svg>
-					<span>Upload Concert Video</span>
+					<span class="tracking-tight drop-shadow-md text-white font-black">Upload Quilt Video</span>
 				{/if}
 			</button>
 
 			<!-- Subtitle / iOS WakeLock Badge -->
-			<div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400">
+			<div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-300">
 				<span>Tap to record or pick from gallery</span>
-				<span class="text-slate-600">•</span>
+				<span class="text-slate-500">•</span>
 				<span>Direct to S3/R2</span>
 				{#if isWakeLockActive}
-					<span class="text-slate-600">•</span>
-					<span class="inline-flex items-center gap-1 text-emerald-400 font-medium bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800/60">
+					<span class="text-slate-500">•</span>
+					<span class="inline-flex items-center gap-1 text-emerald-300 font-medium bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-700/60">
 						<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
 							<path
 								fill-rule="evenodd"
@@ -310,21 +310,21 @@
 			{#if isUploading || statusMessage}
 				<div class="w-full mt-5 pt-4 border-t border-slate-800/80 text-left">
 					<div class="flex justify-between items-center text-xs mb-1.5 font-medium">
-						<span class="text-slate-300 truncate max-w-[200px]">{currentFileName || 'Processing video...'}</span>
-						<span class="text-indigo-400 font-mono">{currentProgress}% {uploadSpeed ? `(${uploadSpeed})` : ''}</span>
+						<span class="text-slate-200 truncate max-w-[200px]">{currentFileName || 'Processing video...'}</span>
+						<span class="text-pink-400 font-mono font-bold">{currentProgress}% {uploadSpeed ? `(${uploadSpeed})` : ''}</span>
 					</div>
 
 					<!-- Progress bar -->
-					<div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden p-0.5">
+					<div class="w-full h-2 bg-slate-800/90 rounded-full overflow-hidden p-0.5">
 						<div
-							class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-200"
+							class="h-full bg-gradient-to-r from-pink-500 via-rose-500 to-amber-400 rounded-full transition-all duration-200"
 							style="width: {currentProgress}%"
 						></div>
 					</div>
 
 					{#if statusMessage}
-						<p class="mt-2 text-xs text-slate-400 flex items-center gap-1.5">
-							<span class="inline-block w-2 h-2 rounded-full {isUploading ? 'bg-indigo-400 animate-ping' : 'bg-emerald-400'}"></span>
+						<p class="mt-2 text-xs text-slate-300 flex items-center gap-1.5">
+							<span class="inline-block w-2 h-2 rounded-full {isUploading ? 'bg-pink-400 animate-ping' : 'bg-emerald-400'}"></span>
 							{statusMessage}
 						</p>
 					{/if}
