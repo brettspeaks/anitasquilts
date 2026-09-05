@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Quilt Base / Fabric Texture Background -->
+  <rect width="64" height="64" rx="10" fill="#0f172a"/>
+  
+  <!-- Quilt Stitch Border -->
+  <rect x="4" y="4" width="56" height="56" rx="8" fill="#1e293b" stroke="#e2e8f0" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6"/>
+  
+  <!-- Quilt Patchwork Star / Pinwheel Pattern -->
+  <g transform="translate(32,32)">
+    <!-- 8 Triangular Patchwork Points -->
+    <polygon points="0,-22 7,-8 0,0" fill="#ec4899"/>
+    <polygon points="0,-22 -7,-8 0,0" fill="#f43f5e"/>
+    
+    <polygon points="22,0 8,7 0,0" fill="#8b5cf6"/>
+    <polygon points="22,0 8,-7 0,0" fill="#6366f1"/>
+    
+    <polygon points="0,22 -7,8 0,0" fill="#06b6d4"/>
+    <polygon points="0,22 7,8 0,0" fill="#0ea5e9"/>
+    
+    <polygon points="-22,0 -8,-7 0,0" fill="#10b981"/>
+    <polygon points="-22,0 -8,7 0,0" fill="#34d399"/>
+
+    <!-- Diagonal Quilt Diamond Points -->
+    <polygon points="15,-15 4,-4 11,0" fill="#fbbf24"/>
+    <polygon points="15,15 4,4 0,11" fill="#f97316"/>
+    <polygon points="-15,15 -4,4 -11,0" fill="#e11d48"/>
+    <polygon points="-15,-15 -4,-4 0,-11" fill="#a855f7"/>
+
+    <!-- Center Patchwork Core -->
+    <rect x="-4" y="-4" width="8" height="8" rx="1" fill="#f8fafc" transform="rotate(45)"/>
+  </g>
+</svg>
