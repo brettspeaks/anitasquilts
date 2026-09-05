@@ -84,8 +84,8 @@ cp .env.example .env
 ```
 
 Fill in your service keys:
-- `PUBLIC_SUPABASE_URL` & `PUBLIC_SUPABASE_ANON_KEY`: From your Supabase Project Settings.
-- `SUPABASE_SERVICE_ROLE_KEY`: Service role key for backend updates.
+- `PUBLIC_SUPABASE_URL` & `PUBLIC_SUPABASE_PUBLISHABLE_KEY`: From your Supabase Project Settings (new API key structure, replaces legacy anon key).
+- `SUPABASE_SECRET_KEY`: Supabase secret API key for backend operations (replaces legacy service_role key).
 - `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET_NAME`, `S3_PUBLIC_DOMAIN`: Cloudflare R2 or AWS S3 credentials.
 - `GEMINI_API_KEY`: From Google AI Studio.
 
@@ -126,7 +126,7 @@ To deploy `worker/gemini-tagger-worker.ts` as a Cloudflare Worker triggered by R
    ```bash
    npx wrangler secret put GEMINI_API_KEY
    npx wrangler secret put SUPABASE_URL
-   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+   npx wrangler secret put SUPABASE_SECRET_KEY
    ```
 3. Deploy:
    ```bash

@@ -13,7 +13,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 export interface Env {
 	GEMINI_API_KEY: string;
 	SUPABASE_URL: string;
-	SUPABASE_SERVICE_ROLE_KEY: string;
+	SUPABASE_SECRET_KEY?: string;
+	SUPABASE_SERVICE_ROLE_KEY?: string; // Legacy fallback
 	WEBHOOK_SECRET?: string;
 	S3_PUBLIC_DOMAIN?: string;
 	R2_BUCKET?: any; // Cloudflare R2 Bucket Binding if deployed on CF
@@ -95,7 +96,8 @@ export default {
  */
 export async function processVideoIntelligence(payload: WebhookPayload, env: Env) {
 	const { videoId, storageKey, storageUrl, mimeType } = payload;
-	const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
+	const authKey = env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY || '';
+	const supabase = createClient(env.SUPABASE_URL, authKey);
 
 	let effectiveKey = storageKey;
 	let effectiveUrl = storageUrl;
