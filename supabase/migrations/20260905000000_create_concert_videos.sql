@@ -1,28 +1,37 @@
 -- ==============================================================================
--- Concert Video Pipeline & AI Tagging Schema
--- Optimized for high-throughput, mobile-first video ingestion
+-- ConcertAI Ingestion-First Pipeline & Gemini Intelligence Schema
+-- Passive multi-cloud ingestion (iOS, Google, Microsoft, Dropbox, S3, R2)
 -- ==============================================================================
 
 -- 1. Enable UUID extension if not already present
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. Create Videos Table
+-- 2. Create Videos Table with Ingestion & Enhanced AI Extraction Fields
 CREATE TABLE IF NOT EXISTS public.videos (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    device_session_token TEXT NOT NULL,
+    source_provider TEXT NOT NULL DEFAULT 's3_bucket' CHECK (
+        source_provider IN ('ios_photos', 'google_photos', 'google_drive', 'dropbox', 'onedrive', 's3_bucket', 'r2_bucket', 'webhook')
+    ),
+    source_file_id TEXT,
     filename TEXT NOT NULL,
     storage_key TEXT NOT NULL UNIQUE,
     storage_url TEXT NOT NULL,
     file_size BIGINT,
     mime_type TEXT DEFAULT 'video/mp4',
-    status TEXT NOT NULL CHECK (status IN ('uploading', 'processing', 'ready', 'failed')) DEFAULT 'uploading',
+    is_favorited BOOLEAN NOT NULL DEFAULT true,
+    status TEXT NOT NULL CHECK (
+        status IN ('pending_sync', 'ingesting', 'processing', 'ready', 'filtered_out', 'failed')
+    ) DEFAULT 'processing',
     error_message TEXT,
     
-    -- AI Extracted Intelligence (Gemini 1.5 Flash)
+    -- Enhanced AI Extracted Intelligence (Gemini 1.5 Flash)
     artist TEXT,
+    performer_details JSONB DEFAULT '{}'::JSONB,
     venue TEXT,
+    lyrics_synced JSONB DEFAULT '[]'::JSONB,
     transcript TEXT,
     visual_tags TEXT[] DEFAULT '{}'::TEXT[],
+    lore_links JSONB DEFAULT '[]'::JSONB,
     metadata JSONB DEFAULT '{}'::JSONB,
     
     -- Timestamps
@@ -31,10 +40,13 @@ CREATE TABLE IF NOT EXISTS public.videos (
 );
 
 -- 3. High-Performance Indexes
-CREATE INDEX IF NOT EXISTS idx_videos_device_session_token ON public.videos (device_session_token);
+CREATE INDEX IF NOT EXISTS idx_videos_source_provider ON public.videos (source_provider);
+CREATE INDEX IF NOT EXISTS idx_videos_is_favorited ON public.videos (is_favorited);
 CREATE INDEX IF NOT EXISTS idx_videos_created_at_desc ON public.videos (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_videos_status ON public.videos (status);
+CREATE INDEX IF NOT EXISTS idx_videos_artist ON public.videos (artist);
 CREATE INDEX IF NOT EXISTS idx_videos_visual_tags ON public.videos USING GIN (visual_tags);
+CREATE INDEX IF NOT EXISTS idx_videos_lore_links ON public.videos USING GIN (lore_links);
 
 -- 4. Automatic updated_at Trigger
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
@@ -54,29 +66,25 @@ CREATE TRIGGER set_videos_updated_at
 -- 5. Enable Row Level Security (RLS)
 ALTER TABLE public.videos ENABLE ROW LEVEL SECURITY;
 
--- Allow anyone to read videos (public feed or device-filtered)
+-- Allow public read access to processed videos
 CREATE POLICY "Allow public read access to videos"
     ON public.videos
     FOR SELECT
     USING (true);
 
--- Allow client-side creation of initial upload records
-CREATE POLICY "Allow public insert for uploads"
+-- Allow serverless workers / backend insertion
+CREATE POLICY "Allow insert for ingestion pipeline"
     ON public.videos
     FOR INSERT
     WITH CHECK (true);
 
--- Allow updates based on matching device session or service role
-CREATE POLICY "Allow update with device token or service role"
+-- Allow serverless workers / backend updates
+CREATE POLICY "Allow update for ingestion pipeline"
     ON public.videos
     FOR UPDATE
-    USING (
-        auth.role() = 'service_role' OR 
-        device_session_token = current_setting('request.headers', true)::json->>'x-device-session' OR
-        device_session_token IS NOT NULL
-    );
+    USING (true);
 
--- 6. Enable Realtime Broadcasting for live status updates in UI
+-- 6. Enable Realtime Broadcasting for live updates in gallery UI
 DO $$
 BEGIN
     IF NOT EXISTS (

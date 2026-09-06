@@ -1,14 +1,20 @@
 /**
- * Cloudflare Worker / Serverless Edge Function: Gemini 1.5 Flash Video Intelligence Tagger
+ * Cloudflare Worker / Serverless Edge Function: ConcertAI Ingestion & Gemini 1.5 Flash Intelligence Pipeline
  * 
- * Triggered by:
- * 1. Cloudflare R2 Event Notifications (Queue / Event Handler)
- * 2. AWS S3 Event Notification Webhook
- * 3. HTTP Webhook POST from Client / Ingestion Pipeline
+ * Ingestion Triggers:
+ * 1. Cloudflare R2 / AWS S3 ObjectCreated Event Notifications
+ * 2. Background Watcher / Queue Sync
+ * 3. HTTP Webhooks from iOS Shortcuts (iCloud Favorites), Google Drive, Dropbox, OneDrive
+ * 
+ * Features:
+ * - Upstream Curated Filtering: Checks if asset is marked as favorite/curated before processing
+ * - Gemini 1.5 Flash Multimodal Extraction (Performer ID, Time-Synced Lyrics, Domain Tags, Lore Links)
+ * - Persists structured intelligence to Supabase PostgreSQL (videos table)
  */
 
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import type { SourceProvider, SyncedLyricLine, LoreLink, PerformerDetails } from '../src/lib/types';
 
 export interface Env {
 	GEMINI_API_KEY: string;
@@ -20,17 +26,21 @@ export interface Env {
 	R2_BUCKET?: any; // Cloudflare R2 Bucket Binding if deployed on CF
 }
 
-interface WebhookPayload {
+export interface IngestionWebhookPayload {
 	videoId?: string;
+	sourceProvider?: SourceProvider;
+	sourceFileId?: string;
 	storageKey?: string;
 	storageUrl?: string;
+	filename?: string;
+	fileSize?: number;
 	mimeType?: string;
-	bucket?: string;
+	isFavorited?: boolean;
+	metadata?: Record<string, unknown>;
 }
 
 export default {
 	async fetch(request: Request, env: Env, ctx: any): Promise<Response> {
-		// Verify method
 		if (request.method !== 'POST') {
 			return new Response(JSON.stringify({ error: 'Method not allowed. Use POST.' }), {
 				status: 405,
@@ -38,7 +48,7 @@ export default {
 			});
 		}
 
-		// Optional Webhook Security Check
+		// Webhook Security Token Check
 		if (env.WEBHOOK_SECRET) {
 			const authHeader = request.headers.get('x-webhook-secret') || request.headers.get('authorization');
 			if (authHeader !== env.WEBHOOK_SECRET && authHeader !== `Bearer ${env.WEBHOOK_SECRET}`) {
@@ -50,19 +60,19 @@ export default {
 		}
 
 		try {
-			const payload: WebhookPayload = await request.json();
-			const result = await processVideoIntelligence(payload, env);
+			const payload: IngestionWebhookPayload = await request.json();
+			const result = await processIngestedVideo(payload, env);
 
 			return new Response(JSON.stringify(result), {
 				status: 200,
 				headers: { 'Content-Type': 'application/json' }
 			});
 		} catch (error: any) {
-			console.error('Worker execution error:', error);
+			console.error('Ingestion worker error:', error);
 			return new Response(
 				JSON.stringify({
 					success: false,
-					error: error?.message || 'Internal Worker Error'
+					error: error?.message || 'Internal Ingestion Worker Error'
 				}),
 				{
 					status: 500,
@@ -72,19 +82,24 @@ export default {
 		}
 	},
 
-	// Cloudflare Queue or R2 Event handler
+	// Cloudflare Queue or R2 Event handler for background push ingestion
 	async queue(batch: any, env: Env): Promise<void> {
 		for (const message of batch.messages) {
 			try {
 				const event = message.body;
-				// Format payload from S3/R2 event
 				const storageKey = event.object?.key || event.Records?.[0]?.s3?.object?.key;
+				const isFavorited = event.isFavorited ?? (storageKey?.includes('/favorites/') || storageKey?.includes('/curated/') || true);
+				
 				if (storageKey) {
-					await processVideoIntelligence({ storageKey }, env);
+					await processIngestedVideo({
+						storageKey,
+						sourceProvider: 'r2_bucket',
+						isFavorited
+					}, env);
 				}
 				message.ack();
 			} catch (err) {
-				console.error('Queue processing error:', err);
+				console.error('Queue ingestion error:', err);
 				message.retry();
 			}
 		}
@@ -92,37 +107,43 @@ export default {
 };
 
 /**
- * Core processing logic: fetch video -> analyze with Gemini 1.5 Flash -> store in Supabase
+ * Core processing pipeline:
+ * 1. Filter upstream: Only process favorited/curated media
+ * 2. Fetch video binary stream
+ * 3. Extract multimodal concert intelligence via Gemini 1.5 Flash
+ * 4. Upsert Supabase record with complete metadata
  */
-export async function processVideoIntelligence(payload: WebhookPayload, env: Env) {
-	const { videoId, storageKey, storageUrl, mimeType } = payload;
+export async function processIngestedVideo(payload: IngestionWebhookPayload, env: Env) {
+	const {
+		videoId,
+		sourceProvider = 's3_bucket',
+		sourceFileId,
+		storageKey,
+		storageUrl,
+		filename,
+		fileSize,
+		mimeType = 'video/mp4',
+		isFavorited = true,
+		metadata = {}
+	} = payload;
+
 	const authKey = env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY || '';
 	const supabase = createClient(env.SUPABASE_URL, authKey);
 
+	// Upstream Curated Filtering
+	if (isFavorited === false) {
+		console.log(`Skipping non-curated asset to preserve AI budget: ${storageKey || filename}`);
+		return {
+			success: true,
+			status: 'filtered_out',
+			message: 'Asset skipped: Not marked as favorited/curated.'
+		};
+	}
+
 	let effectiveKey = storageKey;
 	let effectiveUrl = storageUrl;
-	let effectiveMime = mimeType || 'video/mp4';
 	let recordId = videoId;
-
-	// Lookup video record in Supabase if not all metadata was passed
-	if (recordId || effectiveKey) {
-		const query = recordId
-			? supabase.from('videos').select('*').eq('id', recordId).single()
-			: supabase.from('videos').select('*').eq('storage_key', effectiveKey!).single();
-
-		const { data: record } = await query;
-		if (record) {
-			recordId = record.id;
-			effectiveKey = record.storage_key;
-			effectiveUrl = record.storage_url;
-			effectiveMime = record.mime_type || effectiveMime;
-		}
-	}
-
-	// Set status to 'processing'
-	if (recordId) {
-		await supabase.from('videos').update({ status: 'processing' }).eq('id', recordId);
-	}
+	let effectiveFilename = filename || (storageKey ? storageKey.split('/').pop() || 'concert_clip.mp4' : 'concert_clip.mp4');
 
 	// Resolve public or R2 video access URL
 	if (!effectiveUrl && effectiveKey) {
@@ -131,14 +152,55 @@ export async function processVideoIntelligence(payload: WebhookPayload, env: Env
 			: `https://${env.R2_BUCKET?.name || 'storage'}/${encodeURIComponent(effectiveKey)}`;
 	}
 
-	if (!effectiveUrl) {
-		throw new Error('Could not resolve video URL for Gemini processing.');
+	if (!effectiveUrl && !effectiveKey) {
+		throw new Error('Missing storageKey or storageUrl for ingestion.');
 	}
 
-	// 1. Fetch video data
+	// 1. Create or update video record in Supabase with status = 'processing'
+	if (recordId) {
+		await supabase
+			.from('videos')
+			.update({ status: 'processing', updated_at: new Date().toISOString() })
+			.eq('id', recordId);
+	} else if (effectiveKey) {
+		const { data: existing } = await supabase
+			.from('videos')
+			.select('id')
+			.eq('storage_key', effectiveKey)
+			.maybeSingle();
+
+		if (existing) {
+			recordId = existing.id;
+			await supabase
+				.from('videos')
+				.update({ status: 'processing', updated_at: new Date().toISOString() })
+				.eq('id', recordId);
+		} else {
+			const { data: newRecord } = await supabase
+				.from('videos')
+				.insert({
+					source_provider: sourceProvider,
+					source_file_id: sourceFileId,
+					filename: effectiveFilename,
+					storage_key: effectiveKey,
+					storage_url: effectiveUrl || '',
+					file_size: fileSize,
+					mime_type: mimeType,
+					is_favorited: isFavorited,
+					status: 'processing'
+				})
+				.select()
+				.single();
+
+			if (newRecord) {
+				recordId = newRecord.id;
+			}
+		}
+	}
+
+	// 2. Fetch video data
 	let base64VideoData: string;
 	if (env.R2_BUCKET && effectiveKey) {
-		// Direct R2 binding access for zero-latency Cloudflare Worker execution
 		const r2Object = await env.R2_BUCKET.get(effectiveKey);
 		if (!r2Object) {
 			throw new Error(`R2 Object not found: ${effectiveKey}`);
@@ -146,16 +208,15 @@ export async function processVideoIntelligence(payload: WebhookPayload, env: Env
 		const arrayBuf = await r2Object.arrayBuffer();
 		base64VideoData = uint8ArrayToBase64(new Uint8Array(arrayBuf));
 	} else {
-		// Standard HTTP fetch
-		const res = await fetch(effectiveUrl);
+		const res = await fetch(effectiveUrl!);
 		if (!res.ok) {
-			throw new Error(`Failed to download video (${res.status} ${res.statusText}): ${effectiveUrl}`);
+			throw new Error(`Failed to download video (${res.status}): ${effectiveUrl}`);
 		}
 		const arrayBuf = await res.arrayBuffer();
 		base64VideoData = uint8ArrayToBase64(new Uint8Array(arrayBuf));
 	}
 
-	// 2. Call Gemini 1.5 Flash API
+	// 3. Extract Multimodal Intelligence with Gemini 1.5 Flash
 	const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 	const model = genAI.getGenerativeModel({
 		model: 'gemini-1.5-flash',
@@ -167,24 +228,44 @@ export async function processVideoIntelligence(payload: WebhookPayload, env: Env
 
 	const prompt = `
 You are an expert concert, music, and live performance video intelligence analyzer.
-Analyze this video clip and extract the following structured information in valid JSON:
+Analyze this live performance clip and extract the following structured information in valid JSON:
 
 {
-  "artist": "Artist or Band name if identifiable from audio/visuals, or null if unknown",
-  "venue": "Venue and environment context (e.g. 'Outdoor Stadium', 'Dim Indoor Bar', 'Underground Club', 'Festival Stage', 'Living Room Session')",
-  "transcript": "Verbatim or accurate transcription of sung lyrics and spoken words in the video, or null if no speech/lyrics",
-  "visual_tags": ["Array of concise 1-3 word visual tags describing lighting, instruments, performance style, shots, e.g. 'Stage Lighting', 'Pyrotechnics', 'Drum Solo', 'Crowd Shot', 'Mosh Pit', 'Acoustic Performance'"],
-  "summary": "1-2 sentence high-level summary of the performance clip"
+  "artist": "Identified Artist or Band name, or null if unknown",
+  "performer_details": {
+    "name": "Primary performer or band name",
+    "confidence": 0.95,
+    "genre": "e.g., 'Indie Rock', 'Stadium Rock', 'Acoustic Folk'",
+    "role": "e.g., 'Lead Vocals & Guitar'",
+    "visualCues": ["Key visual stage notes"]
+  },
+  "venue": "Venue, stage setup, or environment context (e.g. 'Red Rocks Amphitheatre', 'Dim Underground Club')",
+  "lyrics_synced": [
+    {
+      "timestamp": "0:05",
+      "text": "Sung lyrics or spoken words",
+      "speaker": "Lead Vocal"
+    }
+  ],
+  "transcript": "Continuous full verbatim transcript of all lyrics and speech.",
+  "visual_tags": ["Array of concise 1-3 word tags for lighting, instruments, crowd dynamics, stage effects"],
+  "lore_links": [
+    {
+      "title": "Wikipedia or lore topic title",
+      "url": "https://en.wikipedia.org/wiki/...",
+      "description": "Interesting background trivia or lore regarding this song/tour.",
+      "category": "wikipedia"
+    }
+  ],
+  "summary": "1-2 sentence performance summary."
 }
-
-Respond ONLY with valid JSON conforming to this structure.
 `;
 
 	const contents = [
 		{
 			inlineData: {
 				data: base64VideoData,
-				mimeType: effectiveMime
+				mimeType
 			}
 		},
 		prompt
@@ -196,24 +277,31 @@ Respond ONLY with valid JSON conforming to this structure.
 	const parsed = JSON.parse(cleaned);
 
 	const aiOutput = {
-		artist: parsed.artist || null,
+		artist: parsed.artist || parsed.performer_details?.name || null,
+		performer_details: parsed.performer_details || null,
 		venue: parsed.venue || null,
+		lyrics_synced: Array.isArray(parsed.lyrics_synced) ? parsed.lyrics_synced : [],
 		transcript: parsed.transcript || null,
 		visual_tags: Array.isArray(parsed.visual_tags) ? parsed.visual_tags : [],
+		lore_links: Array.isArray(parsed.lore_links) ? parsed.lore_links : [],
 		summary: parsed.summary || null
 	};
 
-	// 3. Store result directly into Supabase PostgreSQL
+	// 4. Save ready record to Supabase
 	if (recordId) {
 		const { data: updatedVideo, error: dbError } = await supabase
 			.from('videos')
 			.update({
 				status: 'ready',
 				artist: aiOutput.artist,
+				performer_details: aiOutput.performer_details,
 				venue: aiOutput.venue,
+				lyrics_synced: aiOutput.lyrics_synced,
 				transcript: aiOutput.transcript,
 				visual_tags: aiOutput.visual_tags,
+				lore_links: aiOutput.lore_links,
 				metadata: {
+					...metadata,
 					summary: aiOutput.summary,
 					processed_by_worker: true,
 					analyzed_at: new Date().toISOString()
@@ -224,7 +312,7 @@ Respond ONLY with valid JSON conforming to this structure.
 			.single();
 
 		if (dbError) {
-			console.error('Error updating Supabase database:', dbError);
+			console.error('Database update error:', dbError);
 		}
 
 		return {
@@ -239,7 +327,6 @@ Respond ONLY with valid JSON conforming to this structure.
 	};
 }
 
-// Fast Base64 encoder helper without Buffer dependency
 function uint8ArrayToBase64(bytes: Uint8Array): string {
 	let binary = '';
 	const len = bytes.byteLength;

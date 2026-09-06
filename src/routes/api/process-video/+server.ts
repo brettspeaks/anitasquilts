@@ -6,10 +6,17 @@ import { createPresignedDownloadUrl, getPublicStorageUrl } from '$lib/server/s3'
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const payload = await request.json();
-		const { videoId, storageKey, storageUrl, mimeType } = payload;
+		const { videoId, storageKey, storageUrl, mimeType, isFavorited = true } = payload;
 
 		if (!videoId && !storageKey) {
 			return json({ error: 'Missing videoId or storageKey' }, { status: 400 });
+		}
+
+		if (isFavorited === false) {
+			return json({
+				status: 'filtered_out',
+				message: 'Asset skipped: Upstream filtering excluded non-favorited item.'
+			});
 		}
 
 		const supabase = createServerSupabaseClient();
@@ -38,15 +45,14 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (recordId) {
 			await supabase
 				.from('videos')
-				.update({ status: 'processing' })
+				.update({ status: 'processing', updated_at: new Date().toISOString() })
 				.eq('id', recordId);
 		}
 
 		// Resolve download URL for Gemini
 		let videoAccessUrl = effectiveStorageUrl || getPublicStorageUrl(effectiveStorageKey);
 		try {
-			// For private S3/R2 buckets, generate a temporary signed GET URL
-			if (effectiveStorageKey) {
+			if (effectiveStorageKey && process.env.S3_ACCESS_KEY_ID) {
 				videoAccessUrl = await createPresignedDownloadUrl(effectiveStorageKey, 1800);
 			}
 		} catch (err) {
@@ -64,9 +70,12 @@ export const POST: RequestHandler = async ({ request }) => {
 					.update({
 						status: 'ready',
 						artist: analysis.artist,
+						performer_details: analysis.performer_details,
 						venue: analysis.venue,
+						lyrics_synced: analysis.lyrics_synced,
 						transcript: analysis.transcript,
 						visual_tags: analysis.visual_tags,
+						lore_links: analysis.lore_links,
 						metadata: {
 							summary: analysis.summary,
 							analyzed_at: new Date().toISOString()
