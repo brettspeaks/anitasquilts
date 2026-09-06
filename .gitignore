@@ -24,8 +24,21 @@ profile.cov
 go.work
 go.work.sum
 
-# env file
+# Dependencies
+node_modules/
+
+# SvelteKit build artifacts & generated types
+.svelte-kit/
+build/
+dist/
+
+# Environment files
 .env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
 
 # Editor/IDE
 .idea/
