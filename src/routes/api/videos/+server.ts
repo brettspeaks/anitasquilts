@@ -34,7 +34,42 @@ export const GET: RequestHandler = async ({ url }) => {
 			return json({ videos: getSampleConcertVideos(provider, tag, search) });
 		}
 
-		return json({ videos: (data as VideoRecord[]) || [] });
+		let formattedVideos: VideoRecord[] = (data as any[]).map((row) => ({
+			...row,
+			thumbnail_url: row.thumbnail_url || row.metadata?.thumbnail_url || null,
+			thumbnail_key: row.thumbnail_key || row.metadata?.thumbnail_key || null,
+			source_provider: row.source_provider || row.metadata?.source_provider || 'r2_bucket',
+			performer_details: row.performer_details || row.metadata?.performer_details || null,
+			lyrics_synced: row.lyrics_synced || row.metadata?.lyrics_synced || [],
+			lore_links: row.lore_links || row.metadata?.lore_links || [],
+			is_favorited: row.is_favorited ?? true,
+			visibility: row.visibility || 'public'
+		}));
+
+		if (provider && provider !== 'all') {
+			formattedVideos = formattedVideos.filter(
+				(v) => v.source_provider === provider || (v.metadata as any)?.source_provider === provider
+			);
+		}
+
+		if (tag) {
+			formattedVideos = formattedVideos.filter(
+				(v) => Array.isArray(v.visual_tags) && v.visual_tags.includes(tag)
+			);
+		}
+
+		if (search) {
+			const s = search.toLowerCase();
+			formattedVideos = formattedVideos.filter(
+				(v) =>
+					v.artist?.toLowerCase().includes(s) ||
+					v.venue?.toLowerCase().includes(s) ||
+					v.transcript?.toLowerCase().includes(s) ||
+					v.filename?.toLowerCase().includes(s)
+			);
+		}
+
+		return json({ videos: formattedVideos });
 	} catch (error: any) {
 		console.warn('Supabase videos fallback:', error?.message);
 		return json({ videos: getSampleConcertVideos(provider, tag, search) });
@@ -50,6 +85,7 @@ function getSampleConcertVideos(provider?: string | null, tag?: string | null, s
 			filename: '2026-08-coldplay-live-coimbra.mov',
 			storage_key: 'concerts/curated/coldplay_coimbra.mp4',
 			storage_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+			thumbnail_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80',
 			file_size: 28400000,
 			mime_type: 'video/mp4',
 			is_favorited: true,
@@ -112,6 +148,7 @@ function getSampleConcertVideos(provider?: string | null, tag?: string | null, s
 			filename: 'queen_live_aid_wembley_remastered.mp4',
 			storage_key: 'concerts/curated/queen_live_aid.mp4',
 			storage_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+			thumbnail_url: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80',
 			file_size: 45100000,
 			mime_type: 'video/mp4',
 			is_favorited: true,
@@ -173,6 +210,7 @@ function getSampleConcertVideos(provider?: string | null, tag?: string | null, s
 			filename: 'phoebe_bridgers_kyoto_acoustic.mp4',
 			storage_key: 'concerts/curated/phoebe_kyoto.mp4',
 			storage_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+			thumbnail_url: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=1200&q=80',
 			file_size: 19800000,
 			mime_type: 'video/mp4',
 			is_favorited: true,

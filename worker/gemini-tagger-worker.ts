@@ -32,6 +32,8 @@ export interface IngestionWebhookPayload {
 	sourceFileId?: string;
 	storageKey?: string;
 	storageUrl?: string;
+	thumbnailUrl?: string;
+	thumbnailKey?: string;
 	filename?: string;
 	fileSize?: number;
 	mimeType?: string;
@@ -120,6 +122,8 @@ export async function processIngestedVideo(payload: IngestionWebhookPayload, env
 		sourceFileId,
 		storageKey,
 		storageUrl,
+		thumbnailUrl,
+		thumbnailKey,
 		filename,
 		fileSize,
 		mimeType = 'video/mp4',
@@ -303,6 +307,8 @@ Analyze this live performance clip and extract the following structured informat
 				metadata: {
 					...metadata,
 					summary: aiOutput.summary,
+					thumbnail_url: thumbnailUrl || (metadata as any)?.thumbnail_url || null,
+					thumbnail_key: thumbnailKey || (metadata as any)?.thumbnail_key || null,
 					processed_by_worker: true,
 					analyzed_at: new Date().toISOString()
 				}

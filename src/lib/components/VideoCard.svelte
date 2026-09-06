@@ -12,12 +12,14 @@
 	let { video = $bindable(), onTagClick, onVideoUpdated }: Props = $props();
 
 	let videoEl = $state<HTMLVideoElement | null>(null);
+	let isPlaying = $state(false);
 	let showLyrics = $state(true);
 	let showLore = $state(true);
 	let isShareModalOpen = $state(false);
 	let isUpdatingVisibility = $state(false);
 
 	const videoSource = $derived(video.storage_url);
+	const thumbnailUrl = $derived(video.thumbnail_url || (video.metadata as any)?.thumbnail_url || null);
 	const formattedDate = $derived(
 		new Date(video.created_at).toLocaleDateString(undefined, {
 			month: 'short',
@@ -46,7 +48,15 @@
 		}
 	}
 
+	function startPlayback() {
+		isPlaying = true;
+		if (videoEl) {
+			videoEl.play().catch(() => {});
+		}
+	}
+
 	function seekToTimestamp(line: SyncedLyricLine) {
+		isPlaying = true;
 		if (!videoEl) return;
 		let targetSeconds = line.seconds;
 		if (targetSeconds === undefined && line.timestamp) {
@@ -118,17 +128,54 @@
 				<p class="text-[11px] text-zinc-500 mt-1 max-w-[200px]">{video.error_message || 'Video stream unreachable.'}</p>
 			</div>
 		{:else}
-			<!-- Ready: Native HTML5 Video Player -->
-			<video
-				bind:this={videoEl}
-				src={videoSource}
-				controls
-				playsinline
-				preload="metadata"
-				class="w-full h-full object-contain bg-black"
-			>
-				<track kind="captions" />
-			</video>
+			<!-- Ready: Video with Stored R2 Thumbnail Poster & Fast Play Overlay -->
+			<div class="relative w-full h-full flex items-center justify-center bg-black group/player">
+				<video
+					bind:this={videoEl}
+					src={videoSource}
+					poster={thumbnailUrl || undefined}
+					controls={isPlaying}
+					playsinline
+					preload="metadata"
+					class="w-full h-full object-contain bg-black {isPlaying ? 'opacity-100 z-10' : 'opacity-90'}"
+					onplay={() => (isPlaying = true)}
+				>
+					<track kind="captions" />
+				</video>
+
+				<!-- Stored Thumbnail Poster Overlay (Shows before direct video playback) -->
+				{#if !isPlaying}
+					<button
+						type="button"
+						onclick={startPlayback}
+						class="absolute inset-0 z-10 w-full h-full flex items-center justify-center cursor-pointer bg-black/40 group/poster focus:outline-none"
+						aria-label="Play concert video"
+					>
+						{#if thumbnailUrl}
+							<img
+								src={thumbnailUrl}
+								alt={video.artist ? `${video.artist} concert performance` : video.filename}
+								class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/poster:scale-105"
+								loading="lazy"
+							/>
+							<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/40 group-hover/poster:via-black/10 transition-colors"></div>
+						{/if}
+
+						<!-- Central Glowing Glass Play Button -->
+						<div class="relative flex items-center justify-center w-13 h-13 sm:w-15 sm:h-15 rounded-full bg-zinc-900/85 backdrop-blur-md border border-white/20 text-white shadow-2xl group-hover/poster:scale-110 group-hover/poster:bg-emerald-500 group-hover/poster:text-black group-hover/poster:border-emerald-400 group-hover/poster:shadow-emerald-500/40 transition-all duration-300">
+							<svg class="w-6 h-6 sm:w-7 sm:h-7 ml-0.5 fill-current" viewBox="0 0 24 24">
+								<path d="M8 5v14l11-7z" />
+							</svg>
+						</div>
+
+						<!-- Bottom Right Quality / Stream Tag on Poster -->
+						<div class="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md border border-zinc-800 text-[10px] font-mono text-zinc-300 flex items-center gap-1.5 shadow-sm">
+							<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+							<span>LIVE SHORT</span>
+						</div>
+					</button>
+				{/if}
+			</div>
 		{/if}
 
 		<!-- Source Provider Badge (Top Left) -->

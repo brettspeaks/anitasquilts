@@ -115,6 +115,8 @@ export interface VideoRecord {
 	filename: string;
 	storage_key: string;
 	storage_url: string;
+	thumbnail_url?: string | null;
+	thumbnail_key?: string | null;
 	file_size?: number | null;
 	mime_type?: string | null;
 	is_favorited?: boolean;
@@ -160,6 +162,8 @@ export interface IngestWebhookPayload {
 	sourceProvider: SourceProvider;
 	storageKey?: string;
 	storageUrl?: string;
+	thumbnailUrl?: string;
+	thumbnailKey?: string;
 	filename?: string;
 	fileSize?: number;
 	mimeType?: string;

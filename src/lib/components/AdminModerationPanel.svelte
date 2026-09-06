@@ -323,12 +323,21 @@
 								<div class="flex-1 flex flex-col sm:flex-row gap-4 w-full">
 									<!-- Thumbnail / Video Mock Preview Container -->
 									<div class="w-full sm:w-56 h-36 bg-black rounded-lg border border-zinc-800 overflow-hidden relative shrink-0 group">
-										<video
-											src={post.storage_url}
-											class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-											preload="metadata"
-											muted
-										></video>
+										{#if post.thumbnail_url || (post.metadata as any)?.thumbnail_url}
+											<img
+												src={post.thumbnail_url || (post.metadata as any)?.thumbnail_url}
+												alt={post.artist || post.filename}
+												class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
+												loading="lazy"
+											/>
+										{:else}
+											<video
+												src={post.storage_url}
+												class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+												preload="metadata"
+												muted
+											></video>
+										{/if}
 
 										<!-- Overlay Badges -->
 										<div class="absolute top-2 left-2 flex items-center gap-1.5">

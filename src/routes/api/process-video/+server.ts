@@ -6,7 +6,7 @@ import { createPresignedDownloadUrl, getPublicStorageUrl } from '$lib/server/s3'
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const payload = await request.json();
-		const { videoId, storageKey, storageUrl, mimeType, isFavorited = true } = payload;
+		const { videoId, storageKey, storageUrl, thumbnailUrl, mimeType, isFavorited = true } = payload;
 
 		if (!videoId && !storageKey) {
 			return json({ error: 'Missing videoId or storageKey' }, { status: 400 });
@@ -27,6 +27,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		let effectiveStorageUrl = storageUrl;
 		let effectiveMimeType = mimeType || 'video/mp4';
 
+		let existingMetadata: Record<string, any> = {};
+
 		if (recordId && (!effectiveStorageKey || !effectiveStorageUrl)) {
 			const { data: record } = await supabase
 				.from('videos')
@@ -38,6 +40,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				effectiveStorageKey = record.storage_key;
 				effectiveStorageUrl = record.storage_url;
 				effectiveMimeType = record.mime_type || effectiveMimeType;
+				existingMetadata = record.metadata || {};
 			}
 		}
 
@@ -77,7 +80,9 @@ export const POST: RequestHandler = async ({ request }) => {
 						visual_tags: analysis.visual_tags,
 						lore_links: analysis.lore_links,
 						metadata: {
+							...existingMetadata,
 							summary: analysis.summary,
+							thumbnail_url: thumbnailUrl || existingMetadata.thumbnail_url || null,
 							analyzed_at: new Date().toISOString()
 						}
 					})
