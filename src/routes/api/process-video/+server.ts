@@ -1,5 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { createServerSupabaseClient } from '$lib/supabaseClient';
+import { createServerSupabaseClient } from '$lib/server/supabase';
 import { analyzeVideoWithGemini } from '$lib/server/gemini';
 import { createPresignedDownloadUrl, getPublicStorageUrl } from '$lib/server/s3';
 

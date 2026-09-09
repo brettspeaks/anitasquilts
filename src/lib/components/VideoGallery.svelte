@@ -193,20 +193,20 @@
 	}
 </script>
 
-<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 	<!-- Underground Soundboard: Feed Views, Search & Provider Filters -->
-	<div class="flex flex-col gap-3.5 mb-8">
+	<div class="flex flex-col gap-4 mb-8">
 		<!-- Top View Level Switcher: My Streams vs Public Underground vs Shared -->
-		<div class="flex items-center gap-1.5 p-1 bg-zinc-950/80 rounded-xl border border-zinc-850 overflow-x-auto scrollbar-none shadow-inner">
+		<div class="flex items-center gap-2 p-1.5 bg-[#16181d] rounded-2xl border border-zinc-800 overflow-x-auto scrollbar-none shadow-sm">
 			{#each feedViewTabs as tab}
 				<button
 					type="button"
 					onclick={() => (activeFeedView = tab.id)}
-					class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer shrink-0 {activeFeedView === tab.id
-						? 'bg-zinc-850 text-emerald-400 border border-emerald-500/40 shadow-sm'
-						: 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50 border border-transparent'}"
+					class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer shrink-0 {activeFeedView === tab.id
+						? 'bg-zinc-800 text-amber-300 border border-amber-500/50 shadow-sm'
+						: 'text-zinc-300 hover:text-white hover:bg-zinc-800/60 border border-transparent'}"
 				>
-					<svg class="w-3.5 h-3.5 {activeFeedView === tab.id ? 'text-emerald-400' : 'text-zinc-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg class="w-4 h-4 {activeFeedView === tab.id ? 'text-amber-400' : 'text-zinc-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={tab.icon} />
 					</svg>
 					<span>{tab.label}</span>
@@ -216,22 +216,22 @@
 
 		<!-- Underground Search Input -->
 		<div class="relative w-full">
-			<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400">
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
 				</svg>
 			</div>
 			<input
 				type="search"
 				bind:value={searchQuery}
-				placeholder="Search artist, lyrics, stage lighting, venue, or underground lore..."
-				class="w-full pl-10 pr-12 py-2.5 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/30 text-sm text-zinc-100 placeholder-zinc-500 transition-all font-mono outline-none shadow-inner"
+				placeholder="Search by artist, song lyrics, venue, or band member..."
+				class="w-full pl-12 pr-14 py-3.5 rounded-2xl bg-[#16181d] border border-zinc-700/90 hover:border-zinc-600 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-base text-zinc-100 placeholder-zinc-400 transition-all outline-none shadow-sm"
 			/>
 			{#if searchQuery}
 				<button
 					type="button"
 					onclick={() => (searchQuery = '')}
-					class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-xs font-mono text-zinc-400 hover:text-emerald-400 cursor-pointer"
+					class="absolute inset-y-0 right-0 pr-4 flex items-center text-xs font-mono font-bold text-zinc-400 hover:text-amber-400 cursor-pointer"
 				>
 					CLEAR
 				</button>
@@ -239,14 +239,14 @@
 		</div>
 
 		<!-- Stream Provider Filter Tabs (Audio Switchboard Style) -->
-		<div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+		<div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
 			{#each providersList as prov}
 				<button
 					type="button"
 					onclick={() => handleProviderChange(prov.id)}
-					class="shrink-0 px-3 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer {activeProvider === prov.id
-						? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 shadow-sm shadow-emerald-950'
-						: 'bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/80 border border-zinc-800/80'}"
+					class="shrink-0 px-3.5 py-1.5 rounded-xl text-sm font-medium transition-all cursor-pointer {activeProvider === prov.id
+						? 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-sm'
+						: 'bg-[#16181d] text-zinc-300 hover:text-white hover:bg-zinc-800 border border-zinc-750'}"
 				>
 					{prov.label}
 				</button>
@@ -255,13 +255,13 @@
 
 		<!-- Domain Tag Pills Filter Bar -->
 		{#if allTags.length > 0}
-			<div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+			<div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
 				<button
 					type="button"
 					onclick={() => onTagSelect(null)}
-					class="shrink-0 px-2.5 py-0.5 rounded-md text-[11px] font-mono transition-all cursor-pointer {selectedTag === null
-						? 'bg-zinc-800 text-zinc-100 border border-zinc-600'
-						: 'bg-zinc-950/60 text-zinc-500 hover:text-zinc-300 border border-zinc-850'}"
+					class="shrink-0 px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer {selectedTag === null
+						? 'bg-zinc-700 text-white border border-zinc-500'
+						: 'bg-[#16181d] text-zinc-400 hover:text-zinc-200 border border-zinc-800'}"
 				>
 					ALL TAGS
 				</button>
@@ -270,11 +270,11 @@
 					<button
 						type="button"
 						onclick={() => onTagSelect(selectedTag === tag ? null : tag)}
-						class="shrink-0 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-mono transition-all cursor-pointer {selectedTag === tag
-							? 'bg-emerald-950/80 text-emerald-300 border border-emerald-600/60 shadow-sm'
-							: 'bg-zinc-900/70 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/70 border border-zinc-800'}"
+						class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer {selectedTag === tag
+							? 'bg-amber-950/80 text-amber-200 border border-amber-500 shadow-sm'
+							: 'bg-[#16181d] text-zinc-300 hover:text-white hover:bg-zinc-800 border border-zinc-800'}"
 					>
-						<span class="w-1 h-1 rounded-full {selectedTag === tag ? 'bg-emerald-400' : 'bg-zinc-500'}"></span>
+						<span class="w-1.5 h-1.5 rounded-full {selectedTag === tag ? 'bg-amber-400' : 'bg-zinc-400'}"></span>
 						<span>{tag}</span>
 					</button>
 				{/each}
@@ -284,15 +284,15 @@
 
 	<!-- Gallery Grid Section -->
 	{#if filteredVideos.length === 0}
-		<div class="text-center py-20 px-4 rounded-2xl border border-dashed border-zinc-800/80 bg-zinc-950/40">
-			<div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500">
-				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		<div class="text-center py-20 px-6 rounded-3xl border border-dashed border-zinc-750 bg-[#16181d]/50">
+			<div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-zinc-850 border border-zinc-700 flex items-center justify-center text-zinc-400">
+				<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
 				</svg>
 			</div>
-			<h3 class="text-base font-bold text-zinc-300 font-mono">No Ingested Clips Detected in {activeFeedView === 'public_underground' ? 'Public Underground' : activeFeedView === 'my_streams' ? 'My Streams' : activeFeedView === 'shared' ? 'Shared Feeds' : 'Current View'}</h3>
-			<p class="text-xs text-zinc-500 max-w-sm mx-auto mt-1 leading-relaxed font-sans">
-				Favorite clips in your iOS Photos, Google Drive, Dropbox, or drop MP4 files in your cloud bucket. The pipeline continuously extracts intelligence in the background.
+			<h3 class="text-lg font-bold text-zinc-200">No Tapes Found in {activeFeedView === 'public_underground' ? 'Public Underground' : activeFeedView === 'my_streams' ? 'My Streams' : activeFeedView === 'shared' ? 'Shared Feeds' : 'Current View'}</h3>
+			<p class="text-sm text-zinc-400 max-w-md mx-auto mt-2 leading-relaxed">
+				Favorite concert clips in your iOS Photos, Google Drive, Dropbox, or drop MP4 files in your cloud bucket to automatically extract lyrics and show metadata.
 			</p>
 			{#if searchQuery || selectedTag || activeProvider !== 'all' || activeFeedView !== 'all'}
 				<button
@@ -303,14 +303,14 @@
 						handleProviderChange('all');
 						activeFeedView = 'all';
 					}}
-					class="mt-4 px-3 py-1.5 rounded-lg text-xs font-mono bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-zinc-800 transition-colors cursor-pointer"
+					class="mt-5 px-4 py-2 rounded-xl text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-amber-300 border border-zinc-700 transition-colors cursor-pointer"
 				>
-					RESET ALL FILTERS
+					Reset All Filters
 				</button>
 			{/if}
 		</div>
 	{:else}
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
 			{#each filteredVideos as video (video.id || video.storage_key)}
 				<VideoCard
 					{video}

@@ -17,12 +17,12 @@
 	const roleBadgeColor = $derived.by(() => {
 		switch (activeRole) {
 			case 'admin':
-				return 'bg-emerald-950/80 text-emerald-400 border-emerald-700/60';
+				return 'bg-amber-950/80 text-amber-300 border-amber-700/60';
 			case 'curator':
-				return 'bg-cyan-950/80 text-cyan-400 border-cyan-700/60';
+				return 'bg-cyan-950/80 text-cyan-300 border-cyan-700/60';
 			case 'viewer':
 			default:
-				return 'bg-zinc-800 text-zinc-400 border-zinc-700';
+				return 'bg-zinc-800 text-zinc-300 border-zinc-700';
 		}
 	});
 
@@ -78,31 +78,31 @@
 		<button
 			type="button"
 			onclick={toggleMenu}
-			class="flex items-center gap-2 p-1 pl-2 pr-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 transition-all cursor-pointer group"
+			class="flex items-center gap-2 p-1.5 pl-2.5 pr-3 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-750 hover:border-zinc-700 transition-all cursor-pointer group"
 			aria-expanded={isMenuOpen}
 			aria-haspopup="true"
 		>
 			<!-- Avatar with status indicator dot -->
 			<div class="relative">
-				<div class="w-6 h-6 rounded-md bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[11px] font-mono font-bold text-emerald-400 group-hover:border-emerald-500/50 transition-colors">
+				<div class="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-amber-400 group-hover:border-amber-500/50 transition-colors">
 					{user.name ? user.name[0].toUpperCase() : 'A'}
 				</div>
-				<span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-[#07080c]"></span>
+				<span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-[#16181d]"></span>
 			</div>
 
 			<!-- User Name & Role badge -->
-			<div class="hidden sm:flex flex-col text-left leading-none">
-				<span class="text-xs font-mono font-semibold text-zinc-200 group-hover:text-emerald-300 transition-colors">
+			<div class="hidden sm:flex flex-col text-left leading-tight">
+				<span class="text-xs font-semibold text-zinc-100 group-hover:text-amber-300 transition-colors">
 					{user.name}
 				</span>
-				<span class="text-[9px] font-mono text-zinc-500 uppercase">
+				<span class="text-[10px] text-zinc-400 uppercase font-mono">
 					{activeRole}
 				</span>
 			</div>
 
 			<!-- Chevron -->
 			<svg
-				class="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition-transform duration-200 {isMenuOpen ? 'rotate-180' : ''}"
+				class="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-200 transition-transform duration-200 {isMenuOpen ? 'rotate-180' : ''}"
 				fill="none"
 				stroke="currentColor"
 				viewBox="0 0 24 24"
@@ -112,18 +112,18 @@
 		</button>
 	{:else}
 		<!-- Unauthenticated Login/Register Trigger -->
-		<div class="flex items-center gap-1.5">
+		<div class="flex items-center gap-2">
 			<button
 				type="button"
 				onclick={openLogin}
-				class="px-2.5 py-1 rounded-lg text-xs font-mono text-zinc-300 hover:text-emerald-400 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors cursor-pointer"
+				class="px-3 py-1.5 rounded-xl text-xs font-medium text-zinc-200 hover:text-amber-300 bg-zinc-900 border border-zinc-750 hover:border-zinc-700 transition-colors cursor-pointer"
 			>
 				Sign In
 			</button>
 			<button
 				type="button"
 				onclick={openRegister}
-				class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500 hover:bg-emerald-400 text-black shadow-sm transition-colors cursor-pointer"
+				class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black shadow-sm transition-colors cursor-pointer"
 			>
 				Join
 			</button>

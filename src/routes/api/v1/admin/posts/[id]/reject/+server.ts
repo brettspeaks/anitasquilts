@@ -1,5 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { createServerSupabaseClient } from '$lib/supabaseClient';
+import { createServerSupabaseClient } from '$lib/server/supabase';
 
 export const POST: RequestHandler = async ({ params, request }) => {
 	const { id } = params;

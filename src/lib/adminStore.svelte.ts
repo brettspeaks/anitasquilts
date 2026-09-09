@@ -67,6 +67,99 @@ const INITIAL_USERS: ManagedUser[] = [
 
 const INITIAL_MODERATION_QUEUE: VideoRecord[] = [
 	{
+		id: 'mod-post-105',
+		source_provider: 'ios_photos',
+		source_file_id: 'ph-stream-99411',
+		filename: 'jack_johnson_starlight_kc_better_together_backstage.mov',
+		storage_key: 'concerts/incoming/jj_kc_better_together.mp4',
+		storage_url: 'https://pub-746e0f56527b4112a6bef0fe07dc9f7d.r2.dev/concerts/shorts/avett_brothers_live_acoustic.mp4',
+		thumbnail_url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80',
+		file_size: 28400000,
+		mime_type: 'video/mp4',
+		is_favorited: true,
+		status: 'pending_approval',
+		visibility: 'public',
+		user_id: 'usr-elena-003',
+		owner_name: 'Elena Rostova',
+		team_id: 'ws-anita-main',
+		artist: 'Jack Johnson',
+		performer_details: {
+			name: 'Jack Johnson (Solo Acoustic)',
+			confidence: 0.99,
+			genre: 'Acoustic Rock / Folk',
+			role: 'Acoustic Guitar & Lead Vocals',
+			visualCues: ['Cole Clark Acoustic', 'Kansas City Dressing Room', 'Warm Amber Ambient Lighting']
+		},
+		venue: 'Starlight Theatre (Greenroom), Kansas City, MO',
+		lyrics_synced: [
+			{ timestamp: '0:03', seconds: 3, text: "Mmm, it's always better when we're together...", speaker: 'Jack Johnson' },
+			{ timestamp: '0:15', seconds: 15, text: "Yeah, we'll look at the stars when we're together.", speaker: 'Jack Johnson' },
+			{ timestamp: '0:26', seconds: 26, text: "Well, it's always better when we're together!", speaker: 'Jack Johnson' }
+		],
+		transcript: "It's always better when we're together. Yeah, we'll look at the stars when we're together, well, it's always better when we're together.",
+		visual_tags: ['Backstage Roots', 'Kansas City Soundcheck', 'Acoustic Harmonies', 'Anita Exclusive'],
+		lore_links: [
+			{
+				title: 'Better Together (Song)',
+				url: 'https://en.wikipedia.org/wiki/Better_Together_(Jack_Johnson_song)',
+				description: 'Opening track of In Between Dreams that topped worldwide acoustic charts.',
+				category: 'album'
+			},
+			{
+				title: 'Starlight Theatre (Kansas City, MO)',
+				url: 'https://en.wikipedia.org/wiki/Starlight_Theatre_(Kansas_City,_Missouri)',
+				description: 'Historic 7,958-seat outdoor amphitheatre located in Swope Park, Kansas City, Missouri.',
+				category: 'general'
+			}
+		],
+		metadata: {
+			summary: 'Intimate backstage acoustic warm-up before the Starlight Theatre headline show in Kansas City.',
+			ingest_source: 'iOS Photos Favorites Automation',
+			confidence_score: 99.2
+		},
+		created_at: new Date(Date.now() - 1800000).toISOString(),
+		updated_at: new Date(Date.now() - 1800000).toISOString()
+	},
+	{
+		id: 'mod-post-104',
+		source_provider: 'dropbox',
+		source_file_id: 'dbx-leak-88219',
+		filename: 'unverified_distorted_leak_rip_audio.mp4',
+		storage_key: 'concerts/incoming/unverified_audio_rip.mp4',
+		storage_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+		thumbnail_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80',
+		file_size: 14200000,
+		mime_type: 'video/mp4',
+		is_favorited: false,
+		status: 'pending_approval',
+		visibility: 'private',
+		user_id: 'usr-dave-005',
+		owner_name: 'Dave Morrison',
+		team_id: 'ws-live-crew',
+		artist: 'Unverified Bootleg Stream',
+		performer_details: {
+			name: 'Unknown Soundboard Rip',
+			confidence: 0.42,
+			genre: 'Unverified / Distorted',
+			role: 'Flagged Ingest',
+			visualCues: ['Severe clipping', 'Low lighting', 'Muffled audio']
+		},
+		venue: 'Unknown Basement / Cellar Rip',
+		lyrics_synced: [
+			{ timestamp: '0:01', seconds: 1, text: '[Severe Audio Clipping & Heavy Distortion Detected]', speaker: 'Automated Ingest Filter' }
+		],
+		transcript: '[Severe Audio Clipping & Heavy Distortion Detected - Ingest Flagged for Review]',
+		visual_tags: ['Distorted Audio', 'Low Lighting', 'Unverified Source', 'Flagged Audio', 'Rip Flood'],
+		lore_links: [],
+		metadata: {
+			summary: 'High clipping ratio and poor bitrate detected by automated soundstage pre-filter. Recommended for Block / Quarantine.',
+			ingest_source: 'Dropbox Curated Media Folder',
+			confidence_score: 41.5
+		},
+		created_at: new Date(Date.now() - 2700000).toISOString(),
+		updated_at: new Date(Date.now() - 2700000).toISOString()
+	},
+	{
 		id: 'mod-post-101',
 		source_provider: 'ios_photos',
 		source_file_id: 'ph-stream-99214',
@@ -392,6 +485,11 @@ class AdminStore {
 		this.auditLogs.unshift(audit);
 		this.showNotification(`Approved & published "${post.artist || 'Stream'}"!`, 'success');
 
+		// Emit real-time reactive event for live gallery
+		if (typeof window !== 'undefined') {
+			window.dispatchEvent(new CustomEvent('underground:post-approved', { detail: post }));
+		}
+
 		try {
 			await fetch(`/api/v1/admin/posts/${postId}/approve`, {
 				method: 'POST',
@@ -405,31 +503,78 @@ class AdminStore {
 
 	async rejectPost(postId: string, reason = 'Quarantined by moderator') {
 		const idx = this.moderationQueue.findIndex((p) => p.id === postId);
-		if (idx === -1) return;
-
-		const [post] = this.moderationQueue.splice(idx, 1);
-		post.status = 'quarantined';
-		post.error_message = reason;
-		this.quarantinedPosts.unshift(post);
+		let targetPost: VideoRecord | undefined;
+		if (idx !== -1) {
+			const [post] = this.moderationQueue.splice(idx, 1);
+			post.status = 'quarantined';
+			post.error_message = reason;
+			this.quarantinedPosts.unshift(post);
+			targetPost = post;
+		}
 
 		const audit: ModerationAuditLog = {
 			id: 'audit-' + Math.random().toString(36).substring(2, 9),
 			action: 'post_rejected',
 			target_id: postId,
-			target_title: `${post.artist || 'Concert Video'} - ${post.venue || post.filename}`,
+			target_title: targetPost ? `${targetPost.artist || 'Concert Video'} - ${targetPost.venue || targetPost.filename}` : `Tape ${postId}`,
 			admin_id: authState.user?.id || 'usr-anita-001',
 			admin_name: authState.user?.name || 'Anita S.',
 			timestamp: new Date().toISOString(),
 			details: reason
 		};
 		this.auditLogs.unshift(audit);
-		this.showNotification(`Rejected & quarantined "${post.artist || 'Stream'}"`, 'danger');
+		this.showNotification(`Blocked & quarantined "${targetPost?.artist || 'Stream'}"`, 'danger');
+
+		// Emit real-time reactive event for live gallery
+		if (typeof window !== 'undefined') {
+			window.dispatchEvent(new CustomEvent('underground:post-blocked', { detail: { postId, reason } }));
+		}
 
 		try {
 			await fetch(`/api/v1/admin/posts/${postId}/reject`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ postId, reason, adminId: authState.user?.id })
+			});
+		} catch (e) {
+			console.warn('API sync warning:', e);
+		}
+	}
+
+	async blockPost(video: VideoRecord, reason = 'Flagged & quarantined by Administrator') {
+		// If it's in the moderation queue, reject it from there
+		const idx = this.moderationQueue.findIndex((p) => p.id === video.id);
+		if (idx !== -1) {
+			return this.rejectPost(video.id, reason);
+		}
+
+		// Otherwise block from active gallery
+		video.status = 'quarantined';
+		video.error_message = reason;
+		this.quarantinedPosts.unshift(video);
+
+		const audit: ModerationAuditLog = {
+			id: 'audit-' + Math.random().toString(36).substring(2, 9),
+			action: 'post_rejected',
+			target_id: video.id,
+			target_title: `${video.artist || 'Concert Video'} - ${video.venue || video.filename}`,
+			admin_id: authState.user?.id || 'usr-anita-001',
+			admin_name: authState.user?.name || 'Anita S.',
+			timestamp: new Date().toISOString(),
+			details: reason
+		};
+		this.auditLogs.unshift(audit);
+		this.showNotification(`Blocked "${video.artist || 'Tape'}" from feed.`, 'danger');
+
+		if (typeof window !== 'undefined') {
+			window.dispatchEvent(new CustomEvent('underground:post-blocked', { detail: { postId: video.id, reason } }));
+		}
+
+		try {
+			await fetch(`/api/v1/admin/posts/${video.id}/reject`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ postId: video.id, reason, adminId: authState.user?.id })
 			});
 		} catch (e) {
 			console.warn('API sync warning:', e);

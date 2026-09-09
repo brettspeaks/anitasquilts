@@ -61,38 +61,38 @@
 	}
 </script>
 
-<header class="w-full border-b border-zinc-800/80 bg-[#07080c]/90 backdrop-blur-xl sticky top-0 z-50">
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+<header class="w-full border-b border-zinc-800 bg-[#16181d]/95 backdrop-blur-xl sticky top-0 z-50">
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 		<!-- Underground Brand Mark & Wordmark -->
-		<div class="flex items-center gap-2.5">
-			<div class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-700/80 flex items-center justify-center shadow-inner group">
-				<svg class="w-4 h-4 text-emerald-400 group-hover:text-emerald-300 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+		<div class="flex items-center gap-3">
+			<div class="w-10 h-10 rounded-xl bg-amber-950/40 border border-amber-600/40 flex items-center justify-center shadow-inner group">
+				<svg class="w-5 h-5 text-amber-400 group-hover:text-amber-300 transition-colors" fill="currentColor" viewBox="0 0 24 24">
 					<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
 				</svg>
 			</div>
 			<div class="flex items-center gap-2">
-				<h1 class="text-sm font-bold tracking-wider text-zinc-100 uppercase font-mono">
-					Anita's <span class="text-emerald-400">Underground</span>
+				<h1 class="text-lg sm:text-xl font-bold tracking-wide text-zinc-100 font-sans">
+					Anita's <span class="text-amber-400">Underground</span>
 				</h1>
 			</div>
 		</div>
 
 		<!-- Status, Passive Sync Controls & User Avatar Menu -->
-		<div class="flex items-center gap-2 sm:gap-2.5">
+		<div class="flex items-center gap-2.5 sm:gap-3">
 			<!-- Stream Pulse Status Indicator -->
-			<div class="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-md bg-zinc-900/90 border border-zinc-800 text-[11px] font-mono text-zinc-400">
-				<span class="relative flex h-1.5 w-1.5">
-					<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-					<span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+			<div class="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-zinc-300">
+				<span class="relative flex h-2 w-2">
+					<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+					<span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
 				</span>
-				<span>INGEST:</span>
-				<span class="text-zinc-300">PASSIVE AUTO-SYNC</span>
+				<span class="font-semibold text-zinc-400">VAULT:</span>
+				<span class="text-amber-300 font-medium">LIVE TAPE FEED</span>
 			</div>
 
 			<!-- Offline Indicator -->
 			{#if !isOnline}
-				<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono bg-red-950/60 text-red-400 border border-red-800/60">
-					<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+				<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-red-950/80 text-red-300 border border-red-800">
+					<span class="w-2 h-2 rounded-full bg-red-500"></span>
 					OFFLINE
 				</span>
 			{/if}
@@ -102,8 +102,8 @@
 				<button
 					type="button"
 					onclick={() => adminStore.openPanel('queue')}
-					class="group flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-950/50 hover:bg-amber-950/80 border border-amber-600/50 hover:border-amber-500 text-[11px] font-mono text-amber-300 transition-all cursor-pointer shadow-sm active:scale-95"
-					title="Open Admin Moderation Panel"
+					class="group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-600/60 hover:border-amber-500 text-xs font-medium text-amber-200 transition-all cursor-pointer shadow-sm active:scale-95"
+					title="Open Moderation Panel"
 				>
 					<span class="relative flex h-2 w-2">
 						{#if pendingReviewsCount > 0}
@@ -111,7 +111,7 @@
 						{/if}
 						<span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
 					</span>
-					<span class="font-bold whitespace-nowrap">{pendingReviewsCount} PENDING REVIEWS</span>
+					<span class="font-bold whitespace-nowrap">{pendingReviewsCount} PENDING</span>
 				</button>
 			{/if}
 
@@ -121,11 +121,11 @@
 					type="button"
 					onclick={triggerCloudSync}
 					disabled={isSyncing}
-					class="group flex items-center gap-1.5 px-3 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-850 hover:border-emerald-500/40 active:scale-95 border border-zinc-700/80 text-xs font-mono text-zinc-300 hover:text-emerald-400 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-					title="Trigger manual cloud stream poll"
+					class="group flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 hover:border-amber-500/50 active:scale-95 border border-zinc-700 text-sm font-medium text-zinc-200 hover:text-amber-300 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+					title="Check for new concert tapes"
 				>
 					<svg
-						class="w-3.5 h-3.5 text-zinc-400 group-hover:text-emerald-400 transition-colors {isSyncing ? 'animate-spin text-emerald-400' : ''}"
+						class="w-4 h-4 text-zinc-400 group-hover:text-amber-400 transition-colors {isSyncing ? 'animate-spin text-amber-400' : ''}"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -137,12 +137,12 @@
 							d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
 						/>
 					</svg>
-					<span>{syncFeedback || (isSyncing ? 'SYNCING...' : 'SYNC FEED')}</span>
+					<span>{syncFeedback || (isSyncing ? 'CHECKING...' : 'SYNC TAPES')}</span>
 				</button>
 			{/if}
 
 			<!-- User Avatar Menu & Session Controls -->
-			<div class="pl-1 sm:pl-2 border-l border-zinc-800/80">
+			<div class="pl-1.5 sm:pl-3 border-l border-zinc-800">
 				<UserAvatarMenu />
 			</div>
 		</div>

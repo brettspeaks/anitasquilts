@@ -112,7 +112,7 @@
 <svelte:window onkeydown={handleKeyDown} />
 
 {#if isOpen}
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-200">
 		<!-- Backdrop click to close -->
 		<button
 			type="button"
@@ -122,40 +122,40 @@
 		></button>
 
 		<!-- Modal Dialog Box -->
-		<div class="relative w-full max-w-lg bg-[#0c0e14] border border-zinc-800 rounded-2xl shadow-2xl shadow-emerald-950/30 overflow-hidden flex flex-col z-10 text-zinc-200 font-sans">
+		<div class="relative w-full max-w-lg bg-[#16181e] border border-zinc-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 text-zinc-100 font-sans">
 			<!-- Modal Header -->
-			<div class="flex items-center justify-between px-5 py-4 border-b border-zinc-800 bg-[#07080c]/60">
-				<div class="flex items-center gap-2.5">
-					<div class="p-1.5 rounded-lg bg-emerald-950/60 text-emerald-400 border border-emerald-800/50">
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<div class="flex items-center justify-between px-6 py-4 border-b border-zinc-750 bg-[#121316]/90">
+				<div class="flex items-center gap-3">
+					<div class="p-2 rounded-xl bg-amber-950/60 text-amber-300 border border-amber-600/50">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
 						</svg>
 					</div>
 					<div>
-						<h3 class="text-sm font-bold font-mono text-zinc-100">Asset Sharing & Access Control</h3>
-						<p class="text-[11px] font-mono text-zinc-400 truncate max-w-xs">{video.artist || video.filename}</p>
+						<h3 class="text-base font-bold text-zinc-100">Share Concert Tape</h3>
+						<p class="text-xs text-zinc-300 truncate max-w-xs">{video.artist || video.filename}</p>
 					</div>
 				</div>
 
 				<button
 					type="button"
 					onclick={onClose}
-					class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/80 transition-colors cursor-pointer"
+					class="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
 					aria-label="Close modal"
 				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
 					</svg>
 				</button>
 			</div>
 
 			<!-- Navigation Tabs -->
-			<div class="flex border-b border-zinc-800 bg-zinc-950/40 px-4 pt-2 gap-2 text-xs font-mono">
+			<div class="flex border-b border-zinc-750 bg-zinc-900/60 px-5 pt-2.5 gap-2 text-sm">
 				<button
 					type="button"
 					onclick={() => (activeTab = 'link')}
-					class="px-3 py-2 border-b-2 font-medium transition-colors cursor-pointer {activeTab === 'link'
-						? 'border-emerald-400 text-emerald-300'
+					class="px-4 py-2 border-b-2 font-medium transition-colors cursor-pointer {activeTab === 'link'
+						? 'border-amber-400 text-amber-300'
 						: 'border-transparent text-zinc-400 hover:text-zinc-200'}"
 				>
 					Public Link
@@ -163,8 +163,8 @@
 				<button
 					type="button"
 					onclick={() => (activeTab = 'invite')}
-					class="px-3 py-2 border-b-2 font-medium transition-colors cursor-pointer {activeTab === 'invite'
-						? 'border-emerald-400 text-emerald-300'
+					class="px-4 py-2 border-b-2 font-medium transition-colors cursor-pointer {activeTab === 'invite'
+						? 'border-amber-400 text-amber-300'
 						: 'border-transparent text-zinc-400 hover:text-zinc-200'}"
 				>
 					Invite People ({currentShares.length})
@@ -172,33 +172,33 @@
 				<button
 					type="button"
 					onclick={() => (activeTab = 'embed')}
-					class="px-3 py-2 border-b-2 font-medium transition-colors cursor-pointer {activeTab === 'embed'
-						? 'border-emerald-400 text-emerald-300'
+					class="px-4 py-2 border-b-2 font-medium transition-colors cursor-pointer {activeTab === 'embed'
+						? 'border-amber-400 text-amber-300'
 						: 'border-transparent text-zinc-400 hover:text-zinc-200'}"
 				>
-					Embed Snippet
+					Embed Player
 				</button>
 			</div>
 
 			<!-- Modal Body -->
-			<div class="p-5 space-y-4">
+			<div class="p-6 space-y-4">
 				{#if activeTab === 'link'}
 					<!-- Public Share Link Tab -->
 					<div class="space-y-4">
 						<div>
-							<label for="share-url-input" class="block text-xs font-mono text-zinc-400 mb-1.5 font-medium">Public Stream URL</label>
+							<label for="share-url-input" class="block text-sm text-zinc-300 mb-1.5 font-medium">Direct Tape Link</label>
 							<div class="flex items-center gap-2">
 								<input
 									id="share-url-input"
 									type="text"
 									readonly
 									value={publicShareUrl}
-									class="flex-1 px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 focus:outline-none focus:border-emerald-500/50"
+									class="flex-1 px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs font-mono text-zinc-200 focus:outline-none focus:border-amber-500"
 								/>
 								<button
 									type="button"
 									onclick={copyShareLink}
-									class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold text-xs transition-all active:scale-95 cursor-pointer shrink-0 shadow-md shadow-emerald-950"
+									class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all active:scale-95 cursor-pointer shrink-0 shadow-md"
 								>
 									{isCopiedLink ? 'COPIED!' : 'COPY LINK'}
 								</button>
@@ -206,17 +206,17 @@
 						</div>
 
 						<!-- Security & Expiration Settings -->
-						<div class="p-3.5 rounded-xl bg-zinc-900/70 border border-zinc-800/80 space-y-3">
+						<div class="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-750 space-y-3">
 							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
 									<svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
 									</svg>
-									<span class="text-xs font-mono text-zinc-300">Link Expiration</span>
+									<span class="text-sm text-zinc-200">Link Expiration</span>
 								</div>
 								<select
 									bind:value={expirationOption}
-									class="bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono rounded-lg px-2.5 py-1 focus:outline-none focus:border-emerald-500"
+									class="bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-amber-500"
 								>
 									<option value="never">Never expires</option>
 									<option value="24h">24 Hours</option>
@@ -225,16 +225,16 @@
 								</select>
 							</div>
 
-							<div class="pt-2 border-t border-zinc-800/60 flex items-center justify-between">
+							<div class="pt-2 border-t border-zinc-750 flex items-center justify-between">
 								<div class="flex items-center gap-2">
 									<svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 									</svg>
-									<span class="text-xs font-mono text-zinc-300">Password Protection</span>
+									<span class="text-sm text-zinc-200">Passphrase Protection</span>
 								</div>
 								<label class="relative inline-flex items-center cursor-pointer">
 									<input type="checkbox" bind:checked={isPasswordProtected} class="sr-only peer" />
-									<div class="w-9 h-5 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+									<div class="w-10 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
 								</label>
 							</div>
 
@@ -244,7 +244,7 @@
 										type="password"
 										bind:value={sharePassword}
 										placeholder="Set passphrase to unlock video..."
-										class="w-full px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700 text-xs font-mono text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
+										class="w-full px-3.5 py-2 rounded-xl bg-zinc-800 border border-zinc-700 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500"
 									/>
 								</div>
 							{/if}
@@ -258,20 +258,20 @@
 								type="email"
 								required
 								bind:value={inviteEmail}
-								placeholder="Enter teammate or curator email..."
-								class="flex-1 px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/60"
+								placeholder="Enter teammate or band email..."
+								class="flex-1 px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-amber-500"
 							/>
 							<div class="flex gap-2">
 								<select
 									bind:value={invitePermission}
-									class="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-mono rounded-xl px-2.5 py-2 focus:outline-none focus:border-emerald-500"
+									class="bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-amber-500"
 								>
 									<option value="view">Can View</option>
-									<option value="annotate">Can Annotate/Tag</option>
+									<option value="annotate">Can Annotate</option>
 								</select>
 								<button
 									type="submit"
-									class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold text-xs transition-all active:scale-95 cursor-pointer shadow-md"
+									class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all active:scale-95 cursor-pointer shadow-md"
 								>
 									INVITE
 								</button>
@@ -280,49 +280,49 @@
 
 						<!-- Current Invited Members List -->
 						<div class="space-y-2 max-h-48 overflow-y-auto pr-1">
-							<p class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider font-semibold">Access List</p>
+							<p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Access List</p>
 
 							<!-- Owner row -->
-							<div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800">
-								<div class="flex items-center gap-2.5">
-									<div class="w-7 h-7 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-700/60 flex items-center justify-center text-xs font-bold font-mono">
+							<div class="flex items-center justify-between p-3 rounded-2xl bg-zinc-900/80 border border-zinc-750">
+								<div class="flex items-center gap-3">
+									<div class="w-8 h-8 rounded-xl bg-amber-950 text-amber-300 border border-amber-700/60 flex items-center justify-center text-xs font-bold">
 										{authState.user?.name ? authState.user.name[0].toUpperCase() : 'A'}
 									</div>
 									<div>
-										<p class="text-xs font-mono text-zinc-200 font-medium">{authState.user?.name || 'Anita S.'} (You)</p>
-										<p class="text-[10px] font-mono text-zinc-400">{authState.user?.email || 'anita@underground.ai'}</p>
+										<p class="text-sm text-zinc-200 font-medium">{authState.user?.name || 'Anita S.'} (You)</p>
+										<p class="text-xs text-zinc-400">{authState.user?.email || 'anita@underground.ai'}</p>
 									</div>
 								</div>
-								<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-800/60">
-									Owner / Admin
+								<span class="px-2.5 py-1 rounded-lg text-xs bg-amber-950/80 text-amber-300 border border-amber-800/60 font-medium">
+									Owner
 								</span>
 							</div>
 
 							<!-- Invited Members -->
 							{#each currentShares as share (share.id)}
-								<div class="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-colors">
-									<div class="flex items-center gap-2.5 min-w-0">
-										<div class="w-7 h-7 rounded-lg bg-zinc-800 text-zinc-300 border border-zinc-700 flex items-center justify-center text-xs font-bold font-mono shrink-0">
+								<div class="flex items-center justify-between p-3 rounded-2xl bg-zinc-900/50 border border-zinc-750 hover:border-zinc-700 transition-colors">
+									<div class="flex items-center gap-3 min-w-0">
+										<div class="w-8 h-8 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 flex items-center justify-center text-xs font-bold shrink-0">
 											{share.shared_with_email ? share.shared_with_email[0].toUpperCase() : 'U'}
 										</div>
 										<div class="min-w-0">
-											<p class="text-xs font-mono text-zinc-200 truncate">{share.shared_with_email}</p>
-											<p class="text-[10px] font-mono text-zinc-400">Invited via direct share</p>
+											<p class="text-sm text-zinc-200 truncate">{share.shared_with_email}</p>
+											<p class="text-xs text-zinc-400">Invited via tape link</p>
 										</div>
 									</div>
 
 									<div class="flex items-center gap-2 shrink-0">
-										<span class="px-2 py-0.5 rounded text-[10px] font-mono {share.permission === 'annotate' ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-800/60' : 'bg-zinc-800 text-zinc-400 border border-zinc-700'}">
+										<span class="px-2.5 py-1 rounded-lg text-xs {share.permission === 'annotate' ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-800/60' : 'bg-zinc-800 text-zinc-300 border border-zinc-700'}">
 											{share.permission === 'annotate' ? 'Can Annotate' : 'Can View'}
 										</span>
 										<button
 											type="button"
 											onclick={() => removeShare(share.id)}
-											class="p-1 text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
+											class="p-1.5 text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
 											title="Revoke access"
 											aria-label="Revoke user access"
 										>
-											<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 											</svg>
 										</button>
@@ -334,8 +334,8 @@
 				{:else if activeTab === 'embed'}
 					<!-- One-Click Embed Snippet Tab -->
 					<div class="space-y-3">
-						<p class="text-xs font-mono text-zinc-400">
-							Embed this live video with Gemini lyric intelligence directly into external websites, blogs, or setlist pages.
+						<p class="text-sm text-zinc-300">
+							Embed this concert tape player with full synced song lyrics into external websites, blogs, or setlist pages.
 						</p>
 
 						<div class="relative">
@@ -343,7 +343,7 @@
 								readonly
 								rows="4"
 								value={embedSnippet}
-								class="w-full p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 focus:outline-none focus:border-emerald-500 resize-none"
+								class="w-full p-3.5 rounded-2xl bg-zinc-900 border border-zinc-700 text-xs font-mono text-zinc-200 focus:outline-none focus:border-amber-500 resize-none"
 							></textarea>
 						</div>
 
@@ -351,12 +351,12 @@
 							<button
 								type="button"
 								onclick={copyEmbedSnippet}
-								class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold text-xs transition-all active:scale-95 cursor-pointer shadow-md shadow-emerald-950 flex items-center gap-1.5"
+								class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all active:scale-95 cursor-pointer shadow-md flex items-center gap-1.5"
 							>
 								{#if isCopiedEmbed}
 									<span>SNIPPET COPIED!</span>
 								{:else}
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
 									</svg>
 									<span>COPY EMBED SNIPPET</span>
@@ -368,17 +368,17 @@
 			</div>
 
 			<!-- Modal Footer -->
-			<div class="px-5 py-3 border-t border-zinc-800 bg-[#07080c]/80 flex items-center justify-between text-xs font-mono">
-				<div class="flex items-center gap-1.5 text-zinc-400">
-					<span class="w-1.5 h-1.5 rounded-full {video.visibility === 'public' ? 'bg-emerald-400' : video.visibility === 'team' ? 'bg-cyan-400' : 'bg-zinc-500'}"></span>
-					<span class="capitalize">Current: {video.visibility}</span>
+			<div class="px-6 py-4 border-t border-zinc-750 bg-[#121316]/90 flex items-center justify-between text-xs">
+				<div class="flex items-center gap-2 text-zinc-300">
+					<span class="w-2 h-2 rounded-full {video.visibility === 'public' ? 'bg-amber-400' : video.visibility === 'team' ? 'bg-cyan-400' : 'bg-zinc-500'}"></span>
+					<span class="capitalize font-medium">Access: {video.visibility}</span>
 				</div>
 				<button
 					type="button"
 					onclick={onClose}
-					class="px-3.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
+					class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-medium transition-colors cursor-pointer"
 				>
-					Done
+					Close
 				</button>
 			</div>
 		</div>

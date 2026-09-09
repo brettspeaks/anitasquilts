@@ -1,5 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { createServerSupabaseClient } from '$lib/supabaseClient';
+import { createServerSupabaseClient } from '$lib/server/supabase';
 import type { MediaVisibility } from '$lib/types';
 
 export const PATCH: RequestHandler = async ({ params, request }) => {
