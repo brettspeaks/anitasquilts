@@ -49,7 +49,7 @@ const INITIAL_USERS: ManagedUser[] = [
 		role: 'curator',
 		status: 'pending',
 		workspace_count: 1,
-		created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+		created_at: new Date(Date.now() - 86400000).toISOString(),
 		last_login_at: new Date(Date.now() - 1800000).toISOString()
 	},
 	{

@@ -32,7 +32,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// Upstream Curated Filtering
-		if (isFavorited === false) {
+		if (!isFavorited) {
 			return json({
 				success: true,
 				status: 'filtered_out',
